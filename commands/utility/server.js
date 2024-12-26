@@ -5,6 +5,6 @@ module.exports = {
 		.setName('server')
 		.setDescription('Provides info. about the server.'),
 	async execute(interaction) {
-		await interaction.reply(`This server is ${interaction.guild.name} and has ${interaction.guild.memberCount} members.`);
+		await interaction.reply(`Welcome to ${interaction.guild.name} server, consisting of ${interaction.guild.memberCount} members. Feel free to interact!`);
 	},
 };

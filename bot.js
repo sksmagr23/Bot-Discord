@@ -1,39 +1,39 @@
-const fs = require('node:fs');
-const path = require('node:path');
-const { Client, Collection, GatewayIntentBits } = require('discord.js');
-const { token } = require('./config.json');
+const { Client, Collection, GatewayIntentBits } = require("discord.js");
+const { token } = require("./config.json");
+const fs = require("node:fs");
+const path = require("node:path");
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-
 client.commands = new Collection();
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
 
-for (const folder of commandFolders) {
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-	for (const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
-		const command = require(filePath);
-		if ('data' in command && 'execute' in command) {
-			client.commands.set(command.data.name, command);
-		} else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-		}
-	}
+function loadCommands() {
+  const commands = path.join(__dirname, "commands");
+  fs.readdirSync(commands).forEach((folder) => {
+    const files = fs
+      .readdirSync(path.join(commands, folder))
+      .filter((file) => file.endsWith(".js"));
+
+    files.forEach((file) => {
+      const command = require(path.join(commands, folder, file));
+      if (command.data && command.execute) {
+        client.commands.set(command.data.name, command);
+      } else {
+        console.log(`⚠️ Command ${file} is missing some properties!`);
+      }
+    });
+  });
 }
 
-const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-
-for (const file of eventFiles) {
-	const filePath = path.join(eventsPath, file);
-	const event = require(filePath);
-	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
-	} else {
-		client.on(event.name, (...args) => event.execute(...args));
-	}
+function loadEvents() {
+  const events = path.join(__dirname, "events");
+  fs.readdirSync(events)
+    .filter((file) => file.endsWith(".js"))
+    .forEach((file) => {
+      const event = require(path.join(events, file));
+      client.on(event.name, (...args) => event.execute(...args));
+    });
 }
 
+loadCommands();
+loadEvents();
 client.login(token);

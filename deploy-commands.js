@@ -1,39 +1,40 @@
-const { REST, Routes } = require('discord.js');
-const { clientId, guildId, token } = require('./config.json');
-const fs = require('node:fs');
-const path = require('node:path');
+const { REST, Routes } = require("discord.js");
+const { clientId, guildId, token } = require("./config.json");
+const fs = require("node:fs");
+const path = require("node:path");
 
-const commands = [];
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
+async function loadCommands() {
+  const commands = [];
+  const foldersPath = path.join(__dirname, "commands");
 
-for (const folder of commandFolders) {
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-	
-	for (const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
-		const command = require(filePath);
-		if ('data' in command && 'execute' in command) {
-			commands.push(command.data.toJSON());
-		} else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-		}
-	}
+  fs.readdirSync(foldersPath).forEach((folder) => {
+    fs.readdirSync(path.join(foldersPath, folder))
+      .filter((file) => file.endsWith(".js"))
+      .forEach((file) => {
+        const command = require(path.join(foldersPath, folder, file));
+        if ("data" in command && "execute" in command) {
+          commands.push(command.data.toJSON());
+        } else {
+          console.log(`⚠️ Command ${file} missing some properties!`);
+        }
+      });
+  });
+  return commands;
 }
 
-const rest = new REST().setToken(token);
+async function deployCommands() {
+  try {
+    const rest = new REST().setToken(token);
+    const commands = await loadCommands();
 
-(async () => {
-	try {
-		console.log(`Started refreshing ${commands.length} application (/) commands.`);
+    console.log(`Deploying ${commands.length} commands...`);
+    await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
+      body: commands,
+    });
+    console.log("Congo, commands deployed successfully!");
+  } catch (err) {
+    console.error(err);
+  }
+}
 
-		const data = await rest.put(
-			Routes.applicationGuildCommands(clientId, guildId),
-			{ body: commands },
-		);
-		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
-	} catch (err) {
-		console.error(err);
-	}
-})();
+deployCommands();
