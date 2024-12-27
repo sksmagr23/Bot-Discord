@@ -4,8 +4,7 @@
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon bot.js",
-    "deploy": "nodemon deploy-commands.js"
+    "start": "nodemon bot.js"
   },
   "keywords": [],
   "author": "",
