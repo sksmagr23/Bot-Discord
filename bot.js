@@ -5,9 +5,13 @@ const {
   Routes,
   GatewayIntentBits,
 } = require("discord.js");
-const { token, clientId, guildId } = require("./config.json");
 const fs = require("node:fs");
 const path = require("node:path");
+
+require('dotenv').config();
+const token = process.env.DISCORD_TOKEN;
+const clientId = process.env.CLIENT_ID; 
+const guildId = process.env.GUILD_ID;
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
