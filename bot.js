@@ -9,7 +9,9 @@ const { token, clientId, guildId } = require("./config.json");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
+});
 client.commands = new Collection();
 
 async function loadCommands() {

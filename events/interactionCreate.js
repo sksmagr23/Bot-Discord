@@ -14,6 +14,7 @@ module.exports = {
 		try {
 			await command.execute(interaction);
 		} catch (err) {
+			console.error(err);
 			if (interaction.replied || interaction.deferred) {
 				await interaction.followUp({ content: 'Oops! Error in execution T_T', flags: MessageFlags.Ephemeral });
 			} else {

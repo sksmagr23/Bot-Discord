@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const memeTemplates = require('../../memeTemps/memeTemplates.js');
+const memeTemplates = require('../../extras/memeTemplates.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -31,7 +31,7 @@ module.exports = {
 
             const memeEmbed = new EmbedBuilder()
                 .setImage(url)
-                .setColor('#ff2d00')
+                .setColor('#0099ff')
                 .setFooter({ text: `By ${interaction.user.username}` })
 
             await interaction.editReply({ embeds: [memeEmbed] });
